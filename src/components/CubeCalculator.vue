@@ -1,94 +1,78 @@
 <template>
-	<v-form>
-		<v-container>
-			<v-row>
-				<v-col>
-					<v-text-field
-						v-model="materialState.length"
-						label="Length (m)"
-						type="number"
-						inputmode="decimal"
-						min="0"
-					/>
-				</v-col>
-				<v-col
-					><v-text-field
-						v-model="materialState.width"
-						label="Width (m)"
-						type="number"
-						inputmode="decimal"
-						min="0"
-				/></v-col>
-				<v-col
-					><v-text-field
-						v-model="materialState.depth"
-						label="Depth (mm)"
-						type="number"
-						inputmode="decimal"
-						min="0"
-				/></v-col>
-				<v-col>
-					<v-text-field
-						v-model="materialState.cube"
-						label="Cube (t/m3)"
-						type="number"
-						inputmode="decimal"
-						min="0"
-					/>
-				</v-col>
-			</v-row>
-			<v-row justify="center">
-				<v-col sm="4">
-					<div v-show="materialTotal !== null">
-						<h2 class="subtitle-2">Total:</h2>
-						<span class="display-1">{{ materialTotal }}t</span>
-					</div>
-				</v-col>
-			</v-row>
-		</v-container>
-	</v-form>
+	<v-container>
+		<v-row>
+			<v-col>
+				<v-expansion-panels multiple :mandatory="area.sections.length === 1">
+					<v-expansion-panel
+						v-for="(section, index) in area.sections"
+						:key="index"
+					>
+						<v-expansion-panel-header
+							expand-icon="mdi-pencil"
+							disable-icon-rotate
+						>
+							<template v-slot:default="{ open }">
+								<v-row no-gutters>
+									<v-col cols="10">
+										<v-fade-transition leave-absolute>
+											<span v-if="open" key="0">
+												Section
+											</span>
+											<span v-else key="1">
+												{{ section.label || `Section ${index + 1}` }}
+											</span>
+										</v-fade-transition>
+									</v-col>
+									<v-col cols="2">
+										<v-fade-transition leave-absolute>
+											<span v-if="!open" key="0">
+												{{ formatCalculationSection(section.values) }}
+											</span>
+										</v-fade-transition>
+									</v-col>
+								</v-row>
+							</template>
+						</v-expansion-panel-header>
+						<v-expansion-panel-content>
+							<v-text-field
+								v-model="area.sections[index].label"
+								label="Name"
+								outlined
+								prepend-inner-icon="mdi-label"
+								placeholder="e.g. Driveway"
+							/>
+							<CubeCalculatorSectionForm
+								v-model="area.sections[index].values"
+							/>
+						</v-expansion-panel-content>
+					</v-expansion-panel>
+				</v-expansion-panels>
+			</v-col>
+		</v-row>
+		<v-row></v-row>
+	</v-container>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive } from '@vue/composition-api';
-
-interface MaterialState {
-	length: string;
-	width: string;
-	depth: string;
-	cube: string;
-}
-
-// export interface CubeCalculatorProps {}
+import { defineComponent, reactive } from '@vue/composition-api';
+import CubeCalculatorSectionForm from '@/components/CubeCalculatorSectionForm.vue';
+import { AreaState, SectionValuesState } from '@/interfaces/calculator';
+import {
+	formatCalculationSection,
+	getSectionState,
+} from '@/helpers/calculator';
 
 export default defineComponent({
+	components: { CubeCalculatorSectionForm },
 	setup() {
-		const materialState = reactive<MaterialState>({
-			length: '',
-			width: '',
-			depth: '',
-			cube: '',
-		});
-
-		const materialTotal = computed<string | null>(() => {
-			const values = Object.values(materialState);
-			if (values.some(v => v === '' || Number.isNaN(parseFloat(v))))
-				return null;
-
-			const { length, width, depth, cube } = materialState;
-			/* eslint-disable @typescript-eslint/no-non-null-assertion */
-			return (
-				Number.parseFloat(length!) *
-				Number.parseFloat(width!) *
-				(Number.parseFloat(depth!) / 1000) *
-				Number.parseFloat(cube!)
-			).toFixed(2);
-			/* eslint-enable @typescript-eslint/no-non-null-assertion */
+		const area = reactive<AreaState>({
+			label: '',
+			sections: [getSectionState()],
 		});
 
 		return {
-			materialState,
-			materialTotal,
+			area,
+			formatCalculationSection,
 		};
 	},
 });
