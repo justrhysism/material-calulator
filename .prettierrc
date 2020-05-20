@@ -4,6 +4,7 @@
   "trailingComma": "es5",
   "useTabs": true,
   "vueIndentScriptAndStyle": false,
+  "htmlWhitespaceSensitivity": "ignore",
   "overrides": [
     {
       "files": ["package.json", ".prettierrc"],

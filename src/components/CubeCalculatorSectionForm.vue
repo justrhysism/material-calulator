@@ -1,5 +1,5 @@
 <template>
-	<v-row>
+	<v-row no-gutters>
 		<v-col>
 			<v-row>
 				<v-col cols="6">
@@ -59,9 +59,12 @@
 					/>
 				</v-col>
 			</v-row>
-			<v-row justify="center">
-				<v-col sm="4">
-					<div>
+			<v-row align="end">
+				<v-col cols="6">
+					<slot name="actions-left" />
+				</v-col>
+				<v-col cols="6">
+					<div class="text-right">
 						<h2 class="subtitle-2">{{ totalLabel }}:</h2>
 						<span class="display-1">{{ total }}</span>
 					</div>
