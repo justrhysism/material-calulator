@@ -10,10 +10,10 @@
 						type="number"
 						inputmode="decimal"
 						min="0"
+						required
 						suffix="m"
 						outlined
 						prepend-inner-icon="mdi-arrow-expand-vertical"
-						required
 					/>
 				</v-col>
 				<v-col cols="6">
@@ -24,10 +24,10 @@
 						type="number"
 						inputmode="decimal"
 						min="0"
+						required
 						suffix="m"
 						outlined
 						prepend-inner-icon="mdi-arrow-expand-horizontal"
-						required
 					/>
 				</v-col>
 				<v-col cols="6">
@@ -38,10 +38,10 @@
 						type="number"
 						inputmode="decimal"
 						min="0"
+						required
 						suffix="mm"
 						outlined
 						prepend-inner-icon="mdi-arrow-expand-down"
-						required
 					/>
 				</v-col>
 				<v-col cols="6">
@@ -52,10 +52,10 @@
 						type="number"
 						inputmode="decimal"
 						min="0"
+						required
 						suffix="t/m3"
 						outlined
 						prepend-inner-icon="mdi-arrow-expand-down"
-						required
 					/>
 				</v-col>
 			</v-row>
@@ -65,7 +65,7 @@
 				</v-col>
 				<v-col cols="6">
 					<div class="text-right">
-						<h2 class="subtitle-2">{{ totalLabel }}:</h2>
+						<h3 class="subtitle-2">{{ totalLabel }}:</h3>
 						<span class="display-1">{{ total }}</span>
 					</div>
 				</v-col>

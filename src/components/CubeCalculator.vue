@@ -1,8 +1,10 @@
 <template>
 	<v-container>
+		<!-- Area/Sections -->
 		<v-row>
 			<v-col>
-				<v-expansion-panels :mandatory="area.sections.length === 1">
+				<h2 class="headline mb-2">Area</h2>
+				<v-expansion-panels>
 					<v-expansion-panel
 						v-for="(section, index) in area.sections"
 						:key="index"
@@ -70,6 +72,22 @@
 							</CubeCalculatorSectionForm>
 						</v-expansion-panel-content>
 					</v-expansion-panel>
+
+					<!-- Add Section Button -->
+					<v-expansion-panel readonly>
+						<v-expansion-panel-header hide-actions>
+							<v-row no-gutters>
+								<v-col class="text-center">
+									<v-btn outlined small color="primary" @click="addSection">
+										<v-icon left>mdi-shape-rectangle-plus</v-icon>
+										Add Section
+									</v-btn>
+								</v-col>
+							</v-row>
+						</v-expansion-panel-header>
+					</v-expansion-panel>
+
+					<!-- Total -->
 					<v-expansion-panel>
 						<v-expansion-panel-header>
 							<template v-slot:default="{ open }">
@@ -115,27 +133,53 @@
 											</td>
 										</tr>
 									</tbody>
-									<tfoot>
-										<tr>
-											<th class="text-right" colspan="2">Total</th>
-											<td class="text-right">{{ areaTotalDisplay() }}</td>
-										</tr>
-									</tfoot>
 								</template>
 							</v-simple-table>
+							<div class="text-right">
+								<h3 class="subtitle-1">Total</h3>
+								<span class="display-1">{{ areaTotalDisplay() }}</span>
+							</div>
 						</v-expansion-panel-content>
 					</v-expansion-panel>
 				</v-expansion-panels>
 			</v-col>
 		</v-row>
+
+		<!-- Truck -->
 		<v-row>
 			<v-col>
-				<div class="text-center">
-					<v-btn outlined color="primary" @click="addSection">
-						<v-icon left>mdi-shape-rectangle-plus</v-icon>
-						Add Section
-					</v-btn>
-				</div>
+				<h2 class="headline mb-2 mt-4">Truck</h2>
+				<v-sheet elevation="2" class="px-6 pt-2">
+					<v-row>
+						<v-col col="6">
+							<v-text-field
+								v-model="truckCapacity"
+								label="Capacity"
+								type="number"
+								inputmode="decimal"
+								min="0"
+								suffix="t"
+								outlined
+								required
+								prepend-inner-icon="mdi-dump-truck"
+							/>
+						</v-col>
+						<v-col col="6" class="text-right">
+							<h3 class="subtitle-1">Trips</h3>
+							<p>
+								<span class="d-block display-2">
+									{{ truckTripQuantityDisplay }}
+								</span>
+								<span class="d-block overline" v-show="Boolean(tripQuantity)">
+									Last load:
+									<span class="text-lowercase">
+										{{ truckTripQuantityLastLoad }}
+									</span>
+								</span>
+							</p>
+						</v-col>
+					</v-row>
+				</v-sheet>
 			</v-col>
 		</v-row>
 	</v-container>
@@ -163,6 +207,7 @@ export default defineComponent({
 			label: '',
 			sections: [getSectionState()],
 		});
+
 		const confirmDeleteIndex = ref(-1);
 		const confirmDeleteTimeout = ref(-1);
 
@@ -200,8 +245,26 @@ export default defineComponent({
 			return `${length || '-'} x ${width || '-'} x ${depth} x ${cube || '-'}`;
 		};
 
+		const truckCapacity = ref<number | ''>('');
+		const tripQuantity = computed<number>(() => {
+			const total = areaTotal();
+			if (total === 0 || truckCapacity.value === '') return 0;
+			return total / truckCapacity.value;
+		});
+		const truckTripQuantityDisplay = computed<string>(() =>
+			tripQuantity.value === 0 ? '-' : Math.ceil(tripQuantity.value).toString()
+		);
+		const truckTripQuantityLastLoad = computed<string>(() =>
+			tripQuantity.value === 0 || truckCapacity.value === ''
+				? '-'
+				: `${(areaTotal() % (truckCapacity.value || 0)).toFixed(2)}t`
+		);
+
 		return {
 			area,
+			truckCapacity,
+			truckTripQuantityDisplay,
+			truckTripQuantityLastLoad,
 			calculateSection,
 			formatCalculationSection,
 			addSection,
