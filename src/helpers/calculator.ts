@@ -3,7 +3,11 @@
  */
 
 import { defaultsDeep } from 'lodash-es';
-import { SectionState, SectionValuesState } from '@/interfaces/calculator';
+import {
+	SectionValuesState,
+	SectionState,
+	AreaState,
+} from '@/store/modules/project/interfaces';
 
 export const getSectionValues = (
 	props: Partial<SectionValuesState> = {}
@@ -49,3 +53,9 @@ export const formatCalculationSection = (
 	if (calc === null) return nullOutput;
 	return `${calc.toFixed(decimals)}t`;
 };
+
+export const getAreaState = (props: Partial<SectionState> = {}): AreaState =>
+	defaultsDeep({}, props, {
+		name: 'Area',
+		sections: [getSectionValues()],
+	});

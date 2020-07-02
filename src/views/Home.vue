@@ -6,7 +6,7 @@
 
 <script>
 // @ is an alias to /src
-import CubeCalculator from '@/components/CubeCalculator';
+import CubeCalculator from '@/components/Calculator';
 
 export default {
 	name: 'Home',

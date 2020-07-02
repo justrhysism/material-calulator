@@ -76,15 +76,15 @@
 
 <script lang="ts">
 import { computed, defineComponent, toRefs } from '@vue/composition-api';
-import { SectionValuesState } from '@/interfaces/calculator';
 import {
 	calculateSection,
 	formatCalculationSection,
 	getSectionValues,
 } from '@/helpers/calculator';
+import { SectionValuesState } from '@/store/modules/project/interfaces';
 
 export default defineComponent({
-	name: 'CubeCalculatorSection',
+	name: 'SectionEdit',
 	props: {
 		totalLabel: {
 			type: String,
