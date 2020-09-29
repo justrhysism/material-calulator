@@ -1,5 +1,5 @@
 /**
- * Calculator Interfaces
+ * Area Calculator Interfaces
  */
 
 export interface SectionValuesState {
@@ -10,11 +10,13 @@ export interface SectionValuesState {
 }
 
 export interface SectionState {
-	label?: string;
+	id: string;
+	name?: string;
 	values: SectionValuesState;
 }
 
 export interface AreaState {
-	label?: string;
+	id: string;
+	name?: string;
 	sections: SectionState[];
 }

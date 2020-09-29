@@ -4,9 +4,9 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
-import CubeCalculator from '@/components/CubeCalculator';
+import CubeCalculator from '@/modules/project/modules/calculators/area/components/Calculator';
 
 export default {
 	name: 'Home',
