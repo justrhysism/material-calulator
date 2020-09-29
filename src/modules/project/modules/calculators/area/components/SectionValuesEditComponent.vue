@@ -5,7 +5,6 @@
 				<v-col cols="6">
 					<v-text-field
 						v-model="value.length"
-						@input="updateValue('length', $event.target.value)"
 						label="Length"
 						type="number"
 						inputmode="decimal"
@@ -19,7 +18,6 @@
 				<v-col cols="6">
 					<v-text-field
 						v-model="value.width"
-						@input="updateValue('width', $event.target.value)"
 						label="Width"
 						type="number"
 						inputmode="decimal"
@@ -33,7 +31,6 @@
 				<v-col cols="6">
 					<v-text-field
 						v-model="value.depth"
-						@input="updateValue('depth', $event.target.value)"
 						label="Depth"
 						type="number"
 						inputmode="decimal"
@@ -47,7 +44,6 @@
 				<v-col cols="6">
 					<v-text-field
 						v-model="value.cube"
-						@input="updateValue('cube', $event.target.value)"
 						label="Cube"
 						type="number"
 						inputmode="decimal"
@@ -75,40 +71,31 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, toRefs } from '@vue/composition-api';
+import { computed, defineComponent, PropType } from '@vue/composition-api';
 import {
-	calculateSection,
 	formatCalculationSection,
 	getSectionValues,
-} from '@/helpers/calculator';
-import { SectionValuesState } from '@/store/modules/project/interfaces';
+} from '@/modules/project/modules/calculators/area/utils';
+import { SectionValuesState } from '@/modules/project/modules/calculators/area/interfaces';
 
 export default defineComponent({
-	name: 'SectionEdit',
+	name: 'SectionValuesEditComponent',
 	props: {
 		totalLabel: {
 			type: String,
 			default: 'Subtotal',
 		},
 		value: {
-			type: Object,
+			type: Object as PropType<SectionValuesState>,
 			default: getSectionValues(),
 		},
 	},
-	setup(props, { emit }) {
-		const { value, totalLabel } = props;
-
+	setup(props) {
 		const total = computed<string | null>(() =>
-			formatCalculationSection(value as SectionValuesState)
+			formatCalculationSection(props.value)
 		);
 
-		const updateValue = (key: keyof SectionValuesState, val: string) =>
-			emit('input', {
-				...value,
-				[key]: val,
-			});
-
-		return { value, total, totalLabel, updateValue };
+		return { total };
 	},
 });
 </script>

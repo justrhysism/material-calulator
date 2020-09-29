@@ -10,9 +10,7 @@
 						<v-row no-gutters>
 							<v-col cols="9">
 								<v-fade-transition leave-absolute>
-									<span v-if="open" key="0">
-										Section
-									</span>
+									<span v-if="open" key="0">Section</span>
 									<span v-else key="1">
 										{{ (section.name || '').trim() || `Section ${index + 1}` }}
 									</span>
@@ -21,7 +19,7 @@
 							<v-col cols="3" class="text-right pr-3">
 								<v-fade-transition leave-absolute>
 									<span v-if="!open" key="0">
-										{{ formatCalculationSection }}
+										{{ formatCalculationSection(section.values) }}
 									</span>
 								</v-fade-transition>
 							</v-col>
@@ -29,21 +27,14 @@
 					</template>
 				</v-expansion-panel-header>
 				<v-expansion-panel-content>
-					<v-text-field
-						v-model="area.sections[index].name"
-						label="Name"
-						outlined
-						prepend-inner-icon="mdi-name"
-						placeholder="e.g. Driveway"
-					/>
-					<CubeCalculatorSectionForm v-model="area.sections[index].values">
+					<SectionEditComponent v-model="area.sections[index]">
 						<template v-slot:actions-left>
 							<div v-if="area.sections.length > 1">
 								<v-btn
 									v-if="confirmDeleteIndex === index"
 									outlined
 									color="error"
-									@click="deleteSection"
+									@click="deleteSection(index)"
 								>
 									<v-icon left>mdi-delete-outline</v-icon>
 									Confirm Delete?
@@ -54,13 +45,13 @@
 									tile
 									outlined
 									color="error"
-									@click="confirmDeleteSection"
+									@click="confirmDeleteSection(index)"
 								>
 									<v-icon>mdi-delete-outline</v-icon>
 								</v-btn>
 							</div>
 						</template>
-					</CubeCalculatorSectionForm>
+					</SectionEditComponent>
 				</v-expansion-panel-content>
 			</v-expansion-panel>
 
@@ -93,37 +84,7 @@
 					</template>
 				</v-expansion-panel-header>
 				<v-expansion-panel-content>
-					<v-simple-table class="totals-table">
-						<template v-slot:default>
-							<thead>
-								<tr>
-									<th>Section</th>
-									<th class="text-center">
-										L x W x D x C
-									</th>
-									<th class="text-right">
-										Subtotal
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr v-for="(section, index) in area.sections" :key="index">
-									<td>
-										{{
-											(area.sections[index].name || '').trim() ||
-												`Section ${index + 1}`
-										}}
-									</td>
-									<td class="text-center">
-										{{ presentDimensions }}
-									</td>
-									<td class="text-right">
-										{{ formatCalculationSection }}
-									</td>
-								</tr>
-							</tbody>
-						</template>
-					</v-simple-table>
+					<SectionTotalsTableComponent :sections="area.sections" />
 					<div class="text-right">
 						<h3 class="subtitle-1">Total</h3>
 						<span class="display-1">{{ areaTotalDisplay }}</span>
@@ -134,32 +95,42 @@
 	</div>
 </template>
 <script lang="ts">
-import { reactive, ref, defineComponent } from '@vue/composition-api';
-import { calculateSection, getSectionState } from '@/helpers/calculator';
 import {
-	AreaState,
-	SectionValuesState,
-} from '@/store/modules/project/interfaces';
+	defineComponent,
+	computed,
+	ref,
+	unref,
+	PropType,
+} from '@vue/composition-api';
+import {
+	calculateSection,
+	getSectionState,
+	formatCalculationSection,
+	calculateArea,
+} from '@/modules/project/modules/calculators/area/utils';
+import { AreaState } from '@/modules/project/modules/calculators/area/interfaces';
+import SectionEditComponent from '@/modules/project/modules/calculators/area/components/SectionEditComponent.vue';
+import SectionTotalsTableComponent from '@/modules/project/modules/calculators/area/components/SectionTotalsTableComponent.vue';
 
 export default defineComponent({
-	name: 'AreaControl',
+	name: 'AreaEditComponent',
+	components: {
+		SectionTotalsTableComponent,
+		SectionEditComponent,
+	},
 	props: {
 		value: {
-			type: Object,
+			type: Object as PropType<AreaState>,
 			default: () => ({ name: 'New Area', sections: [getSectionState()] }),
 		},
 	},
-	setup(props, { emit }) {
-		const { value } = props;
-		const area = reactive<AreaState>(value as AreaState);
+	setup(props) {
+		const area = props.value;
 		const confirmDeleteIndex = ref(-1);
 		const confirmDeleteTimeout = ref(-1);
 
-		const emitInput = () => emit('input', area);
-
 		const addSection = () => {
 			area.sections.push(getSectionState());
-			emitInput();
 		};
 
 		const clearDeleteIndex = () => {
@@ -175,55 +146,30 @@ export default defineComponent({
 		const deleteSection = (index: number) => {
 			area.sections.splice(index, 1);
 			clearDeleteIndex();
-			emitInput();
 		};
 
-		const areaTotal = () =>
-			area.sections.reduce(
-				(acc, curr) => acc + (calculateSection(curr.values) ?? 0.0),
-				0.0
-			);
+		const areaTotal = computed(() =>
+			calculateArea({ sections: unref(area.sections) })
+		);
 
-		const areaTotalDisplay = () => {
-			const total = areaTotal();
-			if (total === 0) return '-';
-			return `${areaTotal().toFixed(2)}t`;
-		};
-
-		const presentDimensions = (values: SectionValuesState): string => {
-			const depthParsed = parseFloat(values.depth);
-			const depth = Number.isNaN(depthParsed) ? '-' : depthParsed / 1000;
-			const { length, width, cube } = values;
-
-			return `${length || '-'} x ${width || '-'} x ${depth} x ${cube || '-'}`;
-		};
+		const areaTotalDisplay = computed(() => {
+			if (areaTotal.value === 0) return '-';
+			return `${areaTotal.value.toFixed(2)}t`;
+		});
 
 		return {
 			area,
 			addSection,
 			clearDeleteIndex,
+			confirmDeleteIndex,
 			deleteSection,
 			confirmDeleteSection,
 			calculateSection,
 			getSectionState,
+			formatCalculationSection,
 			areaTotal,
 			areaTotalDisplay,
-			presentDimensions,
 		};
 	},
 });
 </script>
-<style scoped lang="scss">
-.totals-table {
-	td,
-	th {
-		&:first-child {
-			padding-left: 0;
-		}
-
-		&:last-child {
-			padding-right: 0;
-		}
-	}
-}
-</style>

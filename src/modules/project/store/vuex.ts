@@ -1,15 +1,13 @@
 /**
- * Vuex Project Store
+ * Project Repository Store
  */
 
 import { ActionTree, GetterTree, MutationTree } from 'vuex';
 import { AppState } from '@/store/interfaces';
-import { ProjectState } from '@/store/modules/project/interfaces';
+import { ProjectState } from '@/modules/project/interfaces';
 
 //#region Mutation Types
-export const CREATE_AREA = 'CREATE_AREA';
-export const REMOVE_AREA = 'REMOVE_AREA';
-export const DELETE_AREA = 'DELETE_AREA';
+
 //#endregion
 
 const state: ProjectState = {
@@ -18,9 +16,7 @@ const state: ProjectState = {
 
 const getters: GetterTree<ProjectState, AppState> = {};
 
-const mutations: MutationTree<ProjectState> = {
-	[CREATE_AREA]: (state, payload) => {},
-};
+const mutations: MutationTree<ProjectState> = {};
 
 const actions: ActionTree<ProjectState, AppState> = {};
 
