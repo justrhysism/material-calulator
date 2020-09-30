@@ -19,7 +19,7 @@
 							<v-col cols="3" class="text-right pr-3">
 								<v-fade-transition leave-absolute>
 									<span v-if="!open" key="0">
-										{{ formatCalculationSection(section.values) }}
+										{{ formatCalculationSectionSquare(section.values) }}
 									</span>
 								</v-fade-transition>
 							</v-col>
@@ -103,17 +103,17 @@ import {
 	PropType,
 } from '@vue/composition-api';
 import {
-	calculateSection,
+	calculateSectionSquare,
 	getSectionState,
-	formatCalculationSection,
+	formatCalculationSectionSquare,
 	calculateArea,
 } from '@/modules/project/modules/calculators/area/utils';
 import { AreaState } from '@/modules/project/modules/calculators/area/interfaces';
-import SectionEditComponent from '@/modules/project/modules/calculators/area/components/SectionEditComponent.vue';
-import SectionTotalsTableComponent from '@/modules/project/modules/calculators/area/components/SectionTotalsTableComponent.vue';
+import SectionEditComponent from '@/modules/project/modules/calculators/area/components/SectionEdit.vue';
+import SectionTotalsTableComponent from '@/modules/project/modules/calculators/area/components/SectionTotalsTable.vue';
 
 export default defineComponent({
-	name: 'AreaEditComponent',
+	name: 'AreaEdit',
 	components: {
 		SectionTotalsTableComponent,
 		SectionEditComponent,
@@ -164,9 +164,9 @@ export default defineComponent({
 			confirmDeleteIndex,
 			deleteSection,
 			confirmDeleteSection,
-			calculateSection,
+			calculateSectionSquare,
 			getSectionState,
-			formatCalculationSection,
+			formatCalculationSectionSquare,
 			areaTotal,
 			areaTotalDisplay,
 		};

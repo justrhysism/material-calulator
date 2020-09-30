@@ -57,7 +57,7 @@ import {
 	calculateArea,
 	getAreaState,
 } from '@/modules/project/modules/calculators/area/utils';
-import AreaEditComponent from '@/modules/project/modules/calculators/area/components/AreaEditComponent.vue';
+import AreaEditComponent from '@/modules/project/modules/calculators/area/components/AreaEdit.vue';
 import { useProjectState } from '@/modules/project/store/hooks';
 
 export default defineComponent({
@@ -97,19 +97,10 @@ export default defineComponent({
 				: `${truckTripQuantityLastLoadValue.value.toFixed(2)}t`
 		);
 
-		const showLastLoad = computed<boolean>(() => {
-			console.log(
-				'truckTripQuantityLastLoadValue',
-				truckTripQuantityLastLoadValue.value
-			);
-			console.log(
-				'Result',
+		const showLastLoad = computed<boolean>(
+			() =>
 				Boolean(tripQuantity.value) && truckTripQuantityLastLoadValue.value > 0
-			);
-			return (
-				Boolean(tripQuantity.value) && truckTripQuantityLastLoadValue.value > 0
-			);
-		});
+		);
 
 		return {
 			areas,
