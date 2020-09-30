@@ -4,7 +4,8 @@
 			<v-row>
 				<v-col cols="6">
 					<v-text-field
-						v-model="value.length"
+						:value="value.length"
+						@input="handleChange('length', $event)"
 						label="Length"
 						type="number"
 						inputmode="decimal"
@@ -17,7 +18,8 @@
 				</v-col>
 				<v-col cols="6">
 					<v-text-field
-						v-model="value.width"
+						:value="value.width"
+						@input="handleChange('width', $event)"
 						label="Width"
 						type="number"
 						inputmode="decimal"
@@ -30,7 +32,8 @@
 				</v-col>
 				<v-col cols="6">
 					<v-text-field
-						v-model="value.depth"
+						:value="value.depth"
+						@input="handleChange('depth', $event)"
 						label="Depth"
 						type="number"
 						inputmode="decimal"
@@ -43,15 +46,16 @@
 				</v-col>
 				<v-col cols="6">
 					<v-text-field
-						v-model="value.cube"
-						label="Cube"
+						:value="value.density"
+						@input="handleChange('density', $event)"
+						label="Density"
 						type="number"
 						inputmode="decimal"
 						min="0"
 						required
 						suffix="t/m3"
 						outlined
-						prepend-inner-icon="mdi-arrow-expand-down"
+						prepend-inner-icon="mdi-gradient"
 					/>
 				</v-col>
 			</v-row>
@@ -72,30 +76,39 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from '@vue/composition-api';
-import {
-	formatCalculationSection,
-	getSectionValues,
-} from '@/modules/project/modules/calculators/area/utils';
-import { SectionValuesState } from '@/modules/project/modules/calculators/area/interfaces';
+import { formatCalculationSectionSquare } from '@/modules/project/modules/calculators/area/utils';
+import { SectionSquareValuesState } from '@/modules/project/modules/calculators/area/interfaces';
 
 export default defineComponent({
-	name: 'SectionValuesEditComponent',
+	name: 'SectionSquareValuesEdit',
 	props: {
 		totalLabel: {
 			type: String,
 			default: 'Subtotal',
 		},
 		value: {
-			type: Object as PropType<SectionValuesState>,
-			default: getSectionValues(),
+			type: Object as PropType<Partial<SectionSquareValuesState>>,
 		},
 	},
-	setup(props) {
+	setup(props, { emit }) {
 		const total = computed<string | null>(() =>
-			formatCalculationSection(props.value)
+			formatCalculationSectionSquare(props.value)
 		);
 
-		return { total };
+		const handleChange = (
+			field: keyof SectionSquareValuesState,
+			input: string
+		) => {
+			const value = parseFloat(input);
+			if (Number.isNaN(value)) return;
+
+			emit('input', {
+				...props.value,
+				[field]: value,
+			});
+		};
+
+		return { total, handleChange };
 	},
 });
 </script>

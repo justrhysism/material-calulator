@@ -17,7 +17,7 @@
 						{{ presentDimensions(section.values) }}
 					</td>
 					<td class="text-right">
-						{{ formatCalculationSection(section.values) }}
+						{{ formatCalculationSectionSquare(section.values) }}
 					</td>
 				</tr>
 			</tbody>
@@ -27,10 +27,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from '@vue/composition-api';
-import { formatCalculationSection } from '@/modules/project/modules/calculators/area/utils';
+import { formatCalculationSectionSquare } from '@/modules/project/modules/calculators/area/utils';
 import {
 	SectionState,
-	SectionValuesState,
+	SectionSquareValuesState,
 } from '@/modules/project/modules/calculators/area/interfaces';
 
 export default defineComponent({
@@ -43,14 +43,16 @@ export default defineComponent({
 	},
 	setup() {
 		return {
-			formatCalculationSection,
+			formatCalculationSection: formatCalculationSectionSquare,
 
-			presentDimensions(values: SectionValuesState): string {
+			presentDimensions(values: SectionSquareValuesState): string {
 				const depthParsed = parseFloat(values.depth);
 				const depth = Number.isNaN(depthParsed) ? '-' : depthParsed / 1000;
-				const { length, width, cube } = values;
+				const { length, width, density } = values;
 
-				return `${length || '-'} x ${width || '-'} x ${depth} x ${cube || '-'}`;
+				return `${length || '-'} x ${width || '-'} x ${depth} x ${
+					density || '-'
+				}`;
 			},
 		};
 	},
