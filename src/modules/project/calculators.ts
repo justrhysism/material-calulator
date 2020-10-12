@@ -2,33 +2,40 @@
  * Project Calculators
  */
 
-import {
+import defaults from 'lodash-es/defaults';
+import type {
 	Section,
 	SectionDrillDimensions,
 	SectionRectangleDimensions,
 	SectionTriangleDimensions,
+	ZoneParameters,
 } from './interfaces';
 
-export const calculateSectionMass = (section?: Section): number | undefined => {
+export const calculateSectionMass = (
+	section?: Section,
+	zoneParameters?: ZoneParameters
+): number | undefined => {
 	if (!section?.dimensions) return;
+	const dimensions = defaults({}, section.dimensions, zoneParameters);
 
 	switch (section.type) {
 		case 'rectangle':
-			return calculateRectangleMass(section.dimensions);
+			return calculateRectangleMass(dimensions);
 		case 'triangle':
-			return calculateTriangleMass(section.dimensions);
+			return calculateTriangleMass(dimensions);
 		case 'drill':
-			return calculateDrillMass(section.dimensions);
+			return calculateDrillMass(dimensions);
 		default:
 			return undefined;
 	}
 };
 
 export const calculateSectionsMass = (
-	sections?: Section[]
+	sections?: Section[],
+	zoneParameters?: ZoneParameters
 ): number | undefined =>
 	sections?.reduce<number>((acc, section) => {
-		const mass = calculateSectionMass(section) ?? 0;
+		const mass = calculateSectionMass(section, zoneParameters) ?? 0;
 		return acc + mass;
 	}, 0.0);
 

@@ -6,13 +6,15 @@ import React from 'react';
 import ListItem, { ListItemProps } from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import { formatSectionDimensions, formatValue } from '../formatters';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { ListItemIcon } from '@material-ui/core';
 import clsx from 'clsx';
+import defaultsDeep from 'lodash-es/defaultsDeep';
 import { calculateSectionMass } from '../calculators';
-import { Section } from '../interfaces';
+import { formatSectionDimensions, formatValue } from '../formatters';
+import type { Section } from '../interfaces';
 import { getSectionTypeIcon } from '../icons';
+import type { ZoneParametersProps } from './interfaces';
 
 const useStyles = makeStyles((theme) =>
 	createStyles({
@@ -33,12 +35,13 @@ const useStyles = makeStyles((theme) =>
 );
 
 export interface SectionListItemProps
-	extends Omit<ListItemProps<'div', { button: true }>, 'button'> {
+	extends Omit<ListItemProps<'div', { button: true }>, 'button'>,
+		ZoneParametersProps {
 	section: Section;
 }
 
 const SectionListItem: React.FC<SectionListItemProps> = (props) => {
-	const { section, ...listItemProps } = props;
+	const { section, zoneParameters, ...listItemProps } = props;
 	const classes = useStyles();
 
 	return (
@@ -49,11 +52,14 @@ const SectionListItem: React.FC<SectionListItemProps> = (props) => {
 			<ListItemText
 				className={clsx(classes.text, classes.primaryText)}
 				primary={section.name}
-				secondary={formatSectionDimensions(section, true)}
+				secondary={formatSectionDimensions(section, zoneParameters)}
 			/>
 			<ListItemText
 				className={classes.text}
-				primary={formatValue(calculateSectionMass(section), 't')}
+				primary={formatValue(
+					calculateSectionMass(section, zoneParameters),
+					't'
+				)}
 			/>
 			<ListItemSecondaryAction />
 		</ListItem>

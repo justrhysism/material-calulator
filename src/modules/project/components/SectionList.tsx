@@ -9,10 +9,11 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Divider from '@material-ui/core/Divider';
 
-import { Section } from '../interfaces';
-import SectionListItem from './SectionListItem';
+import type { Section } from '../interfaces';
 import { calculateSectionsMass } from '../calculators';
 import { formatValue } from '../formatters';
+import type { ZoneParametersProps } from './interfaces';
+import SectionListItem from './SectionListItem';
 
 const useStyles = makeStyles((theme) =>
 	createStyles({
@@ -32,14 +33,20 @@ const useStyles = makeStyles((theme) =>
 	})
 );
 
-export interface SectionListProps extends ListProps {
+export interface SectionListProps extends ListProps, ZoneParametersProps {
 	items?: Section[];
 	onItemClick?: (section: Section) => void;
 	withTotal?: boolean;
 }
 
 const SectionList: React.FC<SectionListProps> = (props) => {
-	const { items = [], onItemClick, withTotal = false, ...listProps } = props;
+	const {
+		items = [],
+		onItemClick,
+		withTotal = false,
+		zoneParameters,
+		...listProps
+	} = props;
 	const classes = useStyles();
 
 	const handleItemClick = (section: Section) => () =>
@@ -51,6 +58,7 @@ const SectionList: React.FC<SectionListProps> = (props) => {
 				<SectionListItem
 					section={item}
 					onClick={handleItemClick(item)}
+					zoneParameters={zoneParameters}
 					key={index}
 				/>
 			))}
@@ -64,7 +72,10 @@ const SectionList: React.FC<SectionListProps> = (props) => {
 						/>
 						<ListItemText
 							className={classes.totalItemValue}
-							primary={formatValue(calculateSectionsMass(items), 't')}
+							primary={formatValue(
+								calculateSectionsMass(items, zoneParameters),
+								't'
+							)}
 						/>
 					</ListItem>
 				</>

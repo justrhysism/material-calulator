@@ -3,36 +3,34 @@
  */
 
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
-import ArrowExpandDownIcon from 'mdi-material-ui/ArrowExpandDown';
+import Grid, { GridProps } from '@material-ui/core/Grid';
 import ArrowExpandHorizontalIcon from 'mdi-material-ui/ArrowExpandHorizontal';
 import PoundIcon from 'mdi-material-ui/Pound';
-import GradientIcon from '@material-ui/icons/Gradient';
 
-import DimensionField from 'common/components/DimensionField';
-import { SectionDrillDimensions } from '../../interfaces';
+import DimensionField from '@app/common/components/DimensionField';
+import { handleFieldChange } from '@app/utils/handlers';
+import type { SectionDrillDimensions } from '../../interfaces';
+import SectionDimensionsBaseForm, {
+	handleBaseChange,
+} from './SectionDimensionsBaseForm';
+import type { SectionFormBaseProps } from '../interfaces';
 
-export interface SectionDrillDimensionsFormProps {
-	value?: SectionDrillDimensions;
-	onChange?: (value: SectionDrillDimensions) => void;
-}
+export interface SectionDrillDimensionsFormProps
+	extends SectionFormBaseProps<SectionDrillDimensions> {}
 
 const SectionDrillDimensionsForm: React.FC<SectionDrillDimensionsFormProps> = (
 	props
 ) => {
-	const { value, onChange } = props;
+	const { value = {}, onChange, zoneParameters } = props;
 
-	const handleChange = (field: keyof SectionDrillDimensions) => (
-		event: React.ChangeEvent<HTMLInputElement>
-	) =>
-		onChange?.({
-			...value,
-			[field]: event.target.valueAsNumber,
-		});
+	const handleChange = (field: keyof SectionDrillDimensions) =>
+		handleFieldChange(field, value, onChange, { type: 'number' });
+
+	const fieldContainerProps: GridProps = { item: true, xs: 6 };
 
 	return (
 		<Grid container spacing={2}>
-			<Grid item xs={6}>
+			<Grid {...fieldContainerProps}>
 				<DimensionField
 					label="Count"
 					icon={<PoundIcon />}
@@ -40,7 +38,7 @@ const SectionDrillDimensionsForm: React.FC<SectionDrillDimensionsFormProps> = (
 					onChange={handleChange('count')}
 				/>
 			</Grid>
-			<Grid item xs={6}>
+			<Grid {...fieldContainerProps}>
 				<DimensionField
 					label="Width"
 					icon={<ArrowExpandHorizontalIcon />}
@@ -49,28 +47,13 @@ const SectionDrillDimensionsForm: React.FC<SectionDrillDimensionsFormProps> = (
 					onChange={handleChange('diameter')}
 				/>
 			</Grid>
-			<Grid item xs={6}>
-				<DimensionField
-					label="Depth"
-					icon={<ArrowExpandDownIcon />}
-					unitText="mm"
-					value={value?.depth}
-					onChange={handleChange('depth')}
-				/>
-			</Grid>
-			<Grid item xs={6}>
-				<DimensionField
-					label="Density"
-					icon={<GradientIcon />}
-					unitText={
-						<>
-							t/m<sup>3</sup>
-						</>
-					}
-					value={value?.density}
-					onChange={handleChange('density')}
-				/>
-			</Grid>
+			<SectionDimensionsBaseForm
+				value={value}
+				onChange={handleBaseChange(value, onChange)}
+				zoneParameters={zoneParameters}
+				FieldContainerComponent={Grid}
+				FieldContainerProps={fieldContainerProps}
+			/>
 		</Grid>
 	);
 };

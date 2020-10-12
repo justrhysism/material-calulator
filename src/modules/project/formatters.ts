@@ -2,32 +2,35 @@
  * Project Formatters
  */
 
-import {
+import defaults from 'lodash-es/defaults';
+import type {
 	Section,
 	SectionDrillDimensions,
 	SectionRectangleDimensions,
 	SectionTriangleDimensions,
+	ZoneParameters,
 } from './interfaces';
 
 export const formatSectionDimensions = (
 	section: Section,
-	includeType?: boolean
+	zoneParameters?: ZoneParameters
 ) => {
+	const dimensions = defaults({}, section.dimensions, zoneParameters);
+
 	switch (section.type) {
 		case 'rectangle':
-			return formatSectionRectangleDimensions(section.dimensions, includeType);
+			return formatSectionRectangleDimensions(dimensions);
 		case 'triangle':
-			return formatSectionTriangleDimensions(section.dimensions, includeType);
+			return formatSectionTriangleDimensions(dimensions);
 		case 'drill':
-			return formatSectionDrillDimensions(section.dimensions, includeType);
+			return formatSectionDrillDimensions(dimensions);
 		default:
 			return '';
 	}
 };
 
 export const formatSectionRectangleDimensions = (
-	dimensions?: SectionRectangleDimensions,
-	includeType?: boolean
+	dimensions?: SectionRectangleDimensions
 ): string => {
 	if (!dimensions) return '';
 	const parts: string[] = [];
@@ -37,13 +40,11 @@ export const formatSectionRectangleDimensions = (
 	const depthPart =
 		dimensions.depth !== undefined ? ` @ ${dimensions.depth}mm` : '';
 
-	const typePrefix = includeType ? 'Rect: ' : '';
-	return (typePrefix + parts.join(' x ') + depthPart).trim();
+	return (parts.join(' x ') + depthPart).trim();
 };
 
 export const formatSectionTriangleDimensions = (
-	dimensions?: SectionTriangleDimensions,
-	includeType?: boolean
+	dimensions?: SectionTriangleDimensions
 ): string => {
 	if (!dimensions) return '';
 	const parts: string[] = [];
@@ -54,13 +55,11 @@ export const formatSectionTriangleDimensions = (
 	const depthPart =
 		dimensions.depth !== undefined ? ` @ ${dimensions.depth}mm` : '';
 
-	const typePrefix = includeType ? 'Tri: ' : '';
-	return (typePrefix + parts.join(' / ') + depthPart).trim();
+	return (parts.join(' / ') + depthPart).trim();
 };
 
 export const formatSectionDrillDimensions = (
-	dimensions?: SectionDrillDimensions,
-	includeType?: boolean
+	dimensions?: SectionDrillDimensions
 ): string => {
 	if (!dimensions) return '';
 	const { diameter, depth, count = 1 } = dimensions;
@@ -69,8 +68,7 @@ export const formatSectionDrillDimensions = (
 	const diameterPart = diameter !== undefined ? ` ${diameter}mm` : '';
 	const depthPart = depth !== undefined ? ` @ ${depth}mm` : '';
 
-	const typePrefix = includeType ? 'Drill: ' : '';
-	return (typePrefix + countPart + diameterPart + depthPart).trim();
+	return (countPart + diameterPart + depthPart).trim();
 };
 
 export const formatValue = (

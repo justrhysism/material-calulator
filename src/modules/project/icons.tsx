@@ -6,7 +6,7 @@ import React from 'react';
 import RectangleIcon from 'mdi-material-ui/VectorRectangle';
 import TriangleIcon from 'mdi-material-ui/VectorTriangle';
 import DrillIcon from 'mdi-material-ui/ScrewMachineFlatTop';
-import { SectionType } from './interfaces';
+import type { SectionType } from './interfaces';
 
 export { RectangleIcon, TriangleIcon, DrillIcon };
 

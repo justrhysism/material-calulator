@@ -3,19 +3,16 @@
  */
 
 import React, { useState } from 'react';
-import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import LabelIcon from '@material-ui/icons/Label';
 import Box from '@material-ui/core/Box';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import Button from '@material-ui/core/Button';
-
+import InputAdornment from '@material-ui/core/InputAdornment';
+import Grid from '@material-ui/core/Grid';
+import LabelIcon from '@material-ui/icons/Label';
+import TextField from '@material-ui/core/TextField';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 
-import Tooltip from '@material-ui/core/Tooltip';
-import {
+import { getSectionTypeIcon } from '../../icons';
+import type {
 	Section,
 	SectionRectangleDimensions,
 	SectionType,
@@ -23,18 +20,15 @@ import {
 	SectionTriangleDimensions,
 	SectionDimensionsBase,
 } from '../../interfaces';
+import type { SectionFormBaseProps } from '../interfaces';
 import SectionRectangleDimensionsForm from './SectionRectangleDimensionsForm';
 import SectionDrillDimensionsForm from './SectionDrillDimensionsForm';
 import SectionTriangleDimensionsForm from './SectionTriangleDimensionsForm';
-import { getSectionTypeIcon } from '../../icons';
 
-export interface SectionFormProps {
-	value?: Section;
-	onChange?: (section: Section) => void;
-}
+export interface SectionFormProps extends SectionFormBaseProps<Section> {}
 
 const SectionForm: React.FC<SectionFormProps> = (props) => {
-	const { value, onChange } = props;
+	const { value, onChange, zoneParameters } = props;
 
 	const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) =>
 		onChange?.({
@@ -92,6 +86,7 @@ const SectionForm: React.FC<SectionFormProps> = (props) => {
 			DimensionsForm = (
 				<SectionRectangleDimensionsForm
 					value={value?.dimensions}
+					zoneParameters={zoneParameters}
 					onChange={handleDimensionsFormChange(
 						'rectangle',
 						setRectangleDimensions
@@ -103,6 +98,7 @@ const SectionForm: React.FC<SectionFormProps> = (props) => {
 			DimensionsForm = (
 				<SectionTriangleDimensionsForm
 					value={value?.dimensions}
+					zoneParameters={zoneParameters}
 					onChange={handleDimensionsFormChange(
 						'triangle',
 						setTriangleDimensions
@@ -114,6 +110,7 @@ const SectionForm: React.FC<SectionFormProps> = (props) => {
 			DimensionsForm = (
 				<SectionDrillDimensionsForm
 					value={value?.dimensions}
+					zoneParameters={zoneParameters}
 					onChange={handleDimensionsFormChange('drill', setDrillDimensions)}
 				/>
 			);

@@ -4,29 +4,24 @@
 
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import ArrowExpandDownIcon from 'mdi-material-ui/ArrowExpandDown';
-import GradientIcon from '@material-ui/icons/Gradient';
+import DimensionField from '@app/common/components/DimensionField';
+import { handleFieldChange } from '@app/utils/handlers';
+import type { SectionTriangleDimensions } from '../../interfaces';
+import type { SectionFormBaseProps } from '../interfaces';
+import SectionDimensionsBaseForm, {
+	handleBaseChange,
+} from './SectionDimensionsBaseForm';
 
-import DimensionField from 'common/components/DimensionField';
-import { SectionTriangleDimensions } from '../../interfaces';
-
-export interface SectionTriangleDimensionsFormProps {
-	value?: SectionTriangleDimensions;
-	onChange?: (value: SectionTriangleDimensions) => void;
-}
+export interface SectionTriangleDimensionsFormProps
+	extends SectionFormBaseProps<SectionTriangleDimensions> {}
 
 const SectionTriangleDimensionsForm: React.FC<SectionTriangleDimensionsFormProps> = (
 	props
 ) => {
-	const { value, onChange } = props;
+	const { value = {}, onChange, zoneParameters } = props;
 
-	const handleChange = (field: keyof SectionTriangleDimensions) => (
-		event: React.ChangeEvent<HTMLInputElement>
-	) =>
-		onChange?.({
-			...value,
-			[field]: event.target.valueAsNumber,
-		});
+	const handleChange = (field: keyof SectionTriangleDimensions) =>
+		handleFieldChange(field, value, onChange, { type: 'number' });
 
 	return (
 		<Grid container spacing={2}>
@@ -54,28 +49,13 @@ const SectionTriangleDimensionsForm: React.FC<SectionTriangleDimensionsFormProps
 					onChange={handleChange('c')}
 				/>
 			</Grid>
-			<Grid item xs={6}>
-				<DimensionField
-					label="Depth"
-					icon={<ArrowExpandDownIcon />}
-					unitText="mm"
-					value={value?.depth}
-					onChange={handleChange('depth')}
-				/>
-			</Grid>
-			<Grid item xs={6}>
-				<DimensionField
-					label="Density"
-					icon={<GradientIcon />}
-					unitText={
-						<>
-							t/m<sup>3</sup>
-						</>
-					}
-					value={value?.density}
-					onChange={handleChange('density')}
-				/>
-			</Grid>
+			<SectionDimensionsBaseForm
+				value={value}
+				zoneParameters={zoneParameters}
+				onChange={handleBaseChange(value, onChange)}
+				FieldContainerComponent={Grid}
+				FieldContainerProps={{ item: true, xs: 6 }}
+			/>
 		</Grid>
 	);
 };

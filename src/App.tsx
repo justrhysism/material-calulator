@@ -2,53 +2,28 @@ import React, { useState } from 'react';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Box from '@material-ui/core/Box';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import { RecoilRoot } from 'recoil';
-import SectionRectangleDimensionsForm from './modules/project/components/forms/SectionRectangleDimensionsForm';
+import { RecoilRoot, useRecoilValue } from 'recoil';
+import uuid from '@app/lib/uuid';
+import type { Zone } from '@app/modules/project/interfaces';
+import ZoneDetail from '@app/modules/project/components/ZoneDetail';
+import AppBar from '@app/modules/application/components/AppBar';
 import {
-	Section,
-	SectionRectangleDimensions,
-	SectionDrillDimensions,
-	Zone,
-} from './modules/project/interfaces';
-import SectionDrillDimensionsForm from './modules/project/components/forms/SectionDrillDimensionsForm';
-import SectionForm from './modules/project/components/forms/SectionForm';
-import SectionList from 'modules/project/components/SectionList';
-import ZoneDetail from './modules/project/components/ZoneDetail';
-import uuid from 'lib/uuid';
+	appSettingDarkMode,
+	appSettingDensity,
+} from './modules/application/store/settings';
+import { DarkModeSetting } from '@app/modules/application/enums';
+import { hasAmbientLightSensor } from './lib/detects';
+import useAmbientLightSensor from './lib/hooks/useAmbientLightSensor';
 
-function App() {
-	const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-
-	const theme = React.useMemo(
-		() =>
-			createMuiTheme({
-				palette: {
-					type: prefersDarkMode ? 'dark' : 'light',
-				},
-				typography: {
-					fontFamily: [
-						'-apple-system',
-						'BlinkMacSystemFont',
-						'Roboto',
-						'"Segoe UI"',
-						'"Helvetica Neue"',
-						'Arial',
-						'sans-serif',
-						'"Apple Color Emoji"',
-						'"Segoe UI Emoji"',
-						'"Segoe UI Symbol"',
-					].join(','),
-				},
-			}),
-		[prefersDarkMode]
-	);
+function AppContent() {
+	const defaultDensity = useRecoilValue(appSettingDensity);
+	// TODO: Flow app settings into parameters
 
 	const [zone, setZone] = useState<Zone>({
 		name: 'Front Yard',
+		parameters: {
+			density: defaultDensity,
+		},
 		sections: [
 			{
 				id: uuid(),
@@ -88,23 +63,79 @@ function App() {
 	});
 
 	return (
-		<RecoilRoot>
-			<ThemeProvider theme={theme}>
-				<CssBaseline />
-				<div className="App">
-					<AppBar position="static">
-						<Toolbar style={{ justifyContent: 'space-between' }}>
-							<Typography variant="h6" noWrap>
-								Material Calculator
-							</Typography>
-							<Typography>v0.1.0</Typography>
-						</Toolbar>
-					</AppBar>
+		<>
+			<AppBar />
+			<ZoneDetail value={zone} onChange={setZone} defaultExpanded />
+		</>
+	);
+}
 
-					{/*<SectionForm value={section} onChange={setSection} />*/}
-					<ZoneDetail value={zone} onChange={setZone} defaultExpanded />
-				</div>
-			</ThemeProvider>
+function Providers({ children }: React.PropsWithChildren<{}>) {
+	// TODO: Shift light setting to hook
+	const darkModeSetting = useRecoilValue(appSettingDarkMode);
+	const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+	const lux = useAmbientLightSensor(darkModeSetting === DarkModeSetting.SENSOR);
+	let paletteMode: 'light' | 'dark';
+
+	switch (darkModeSetting) {
+		case DarkModeSetting.LIGHT:
+			paletteMode = 'light';
+			break;
+		case DarkModeSetting.DARK:
+			paletteMode = 'dark';
+			break;
+		case DarkModeSetting.SENSOR:
+			console.log('hasDeviceLightEvent', hasAmbientLightSensor(), 'lux', lux);
+			if (hasAmbientLightSensor() && lux !== undefined) {
+				paletteMode = lux < 50 ? 'dark' : 'light';
+				break;
+			}
+
+		// AUTO - We want SENSOR to fall through if it's not available.
+		// eslint-disable-next-line no-fallthrough
+		default:
+			paletteMode = prefersDarkMode ? 'dark' : 'light';
+	}
+	console.log('paletteMode', paletteMode);
+
+	const theme = React.useMemo(
+		() =>
+			createMuiTheme({
+				palette: {
+					type: paletteMode,
+				},
+				typography: {
+					fontFamily: [
+						'-apple-system',
+						'BlinkMacSystemFont',
+						'Roboto',
+						'"Segoe UI"',
+						'"Helvetica Neue"',
+						'Arial',
+						'sans-serif',
+						'"Apple Color Emoji"',
+						'"Segoe UI Emoji"',
+						'"Segoe UI Symbol"',
+					].join(','),
+				},
+			}),
+		[paletteMode]
+	);
+
+	return (
+		<ThemeProvider theme={theme}>
+			<CssBaseline />
+			{children}
+		</ThemeProvider>
+	);
+}
+
+function App() {
+	return (
+		<RecoilRoot>
+			<Providers>
+				<AppContent />
+			</Providers>
 		</RecoilRoot>
 	);
 }

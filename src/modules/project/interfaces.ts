@@ -62,8 +62,12 @@ export type SectionDrill = SectionBase & {
 
 export type Section = SectionRectangle | SectionTriangle | SectionDrill;
 
+export interface ZoneParameters extends SectionDimensionsBase {}
+
 export interface Zone {
 	id?: string;
 	name?: string;
+	notes?: string;
+	parameters?: ZoneParameters;
 	sections?: Section[];
 }
