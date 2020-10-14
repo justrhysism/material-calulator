@@ -48,7 +48,7 @@ const SectionDialog: React.FC<SectionDialogProps> = (props) => {
 						<Typography component="span" variant="h6">
 							{formatValue(
 								calculateSectionMass(editSection, zoneParameters),
-								't'
+								't',
 							)}
 						</Typography>
 					</Box>
@@ -57,7 +57,6 @@ const SectionDialog: React.FC<SectionDialogProps> = (props) => {
 			<DialogActions>
 				<Button
 					onClick={(event) => dialogProps.onClose?.(event, 'escapeKeyDown')}
-					color="primary"
 				>
 					Cancel
 				</Button>

@@ -73,9 +73,12 @@ export const formatSectionDrillDimensions = (
 
 export const formatValue = (
 	value?: number,
-	postfix?: string,
+	postfix: string = '',
 	invalid = '-'
 ): string => {
 	if (!value || Number.isNaN(value)) return invalid;
 	return `${value.toFixed(2)}${postfix}`;
 };
+
+export const formatInvalid = (value?: number, invalid = '-') =>
+	!value || Number.isNaN(value) ? invalid : value;

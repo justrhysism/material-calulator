@@ -14,40 +14,36 @@ import { calculateSectionsMass } from '../calculators';
 import { formatValue } from '../formatters';
 import type { ZoneParametersProps } from './interfaces';
 import SectionListItem from './SectionListItem';
+import { Typography } from '@material-ui/core';
+import { useRecoilValue } from 'recoil';
+import { appSettingTruckCapacity } from '@app/modules/application/store/settings';
 
-const useStyles = makeStyles((theme) =>
-	createStyles({
-		totalItem: {
-			paddingTop: theme.spacing(2),
-			paddingBottom: theme.spacing(2),
-			justifyContent: 'flex-end',
-		},
-		totalItemLabel: {
-			flexGrow: 1,
-			textAlign: 'right',
-		},
-		totalItemValue: {
-			flex: '0 1 auto',
-			paddingLeft: theme.spacing(2),
-		},
-	})
-);
+// const useStyles = makeStyles((theme) =>
+// 	createStyles({
+// 		totalItem: {
+// 			paddingTop: theme.spacing(2),
+// 			paddingBottom: theme.spacing(2),
+// 			justifyContent: 'flex-end',
+// 		},
+// 		totalItemLabel: {
+// 			flexGrow: 1,
+// 			textAlign: 'right',
+// 		},
+// 		totalItemValue: {
+// 			flex: '0 1 auto',
+// 			paddingLeft: theme.spacing(2),
+// 		},
+// 	}),
+// );
 
 export interface SectionListProps extends ListProps, ZoneParametersProps {
 	items?: Section[];
 	onItemClick?: (section: Section) => void;
-	withTotal?: boolean;
 }
 
 const SectionList: React.FC<SectionListProps> = (props) => {
-	const {
-		items = [],
-		onItemClick,
-		withTotal = false,
-		zoneParameters,
-		...listProps
-	} = props;
-	const classes = useStyles();
+	const { items = [], onItemClick, zoneParameters, ...listProps } = props;
+	// const classes = useStyles();
 
 	const handleItemClick = (section: Section) => () =>
 		onItemClick?.({ ...section });
@@ -62,22 +58,10 @@ const SectionList: React.FC<SectionListProps> = (props) => {
 					key={index}
 				/>
 			))}
-			{withTotal && (
+			{props.children && (
 				<>
 					<Divider />
-					<ListItem className={classes.totalItem}>
-						<ListItemText
-							className={classes.totalItemLabel}
-							secondary="Total:"
-						/>
-						<ListItemText
-							className={classes.totalItemValue}
-							primary={formatValue(
-								calculateSectionsMass(items, zoneParameters),
-								't'
-							)}
-						/>
-					</ListItem>
+					{props.children}
 				</>
 			)}
 		</List>
